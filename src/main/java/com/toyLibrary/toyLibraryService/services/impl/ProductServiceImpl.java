@@ -55,9 +55,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional
-    public ResponseDTO<String> deleteProduct(Integer i){
+    public ResponseDTO<String> deleteProduct(Integer id){
         // Delete Product by ID
-        Optional<Product> optionalProduct = productRepository.findById(i);
+        Optional<Product> optionalProduct = productRepository.findById(id);
         if(optionalProduct.isEmpty()){
             // Product does not exist! Returning Error!
             System.out.println("Product does not exist with given ID!");
@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
         }
         // If product exists, check if it is not currently booked by someone
         Product p = optionalProduct.get();
-        if(Objects.nonNull(p.getBookedBy())){
+        if(checkIfProductIsAlreadyBooked(id)){
             // Currently, booked by someone! Cannot delete!
             System.out.println("Product currently booked by a customer!");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Product is currently booked by a customer! Cannot delete!");
@@ -74,4 +74,21 @@ public class ProductServiceImpl implements ProductService {
         productRepository.delete(p);
         return new ResponseDTO<>(HttpStatus.OK.value(), "Product Deleted Successfully!");
     }
+
+    public boolean checkIfProductIsAlreadyBooked(Integer id){
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if(optionalProduct.isEmpty()){
+            // Product does not exist! Returning Error!
+            System.out.println("Product does not exist with given ID!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found with provided ID!");
+        }
+        // If product exists, check if it is not currently booked by someone
+        Product p = optionalProduct.get();
+        if(Objects.nonNull(p.getBookedBy())){
+            // Already booked!
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -10,4 +10,5 @@ public interface ProductService {
     ResponseDTO<ProductResponseDTO> addProduct(ProductRequestDTO req);
     ResponseDTO<ProductResponseDTO> editProduct(ProductRequestDTO req);
     ResponseDTO<String> deleteProduct(Integer i);
+    boolean checkIfProductIsAlreadyBooked(Integer id);
 }
