@@ -24,6 +24,13 @@ public class BookingHistory {
     @Column(name = "booked_until")
     private Date bookedUntil;
 
+    public BookingHistory(Users userId, Product productId, Date bookedFrom, Date bookedUntil) {
+        this.userId = userId;
+        this.productId = productId;
+        this.bookedFrom = bookedFrom;
+        this.bookedUntil = bookedUntil;
+    }
+
     public int getId() {
         return id;
     }

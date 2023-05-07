@@ -5,6 +5,7 @@ import com.toyLibrary.toyLibraryService.dto.response.ProductListResponseDTO;
 import com.toyLibrary.toyLibraryService.dto.response.ProductResponseDTO;
 import com.toyLibrary.toyLibraryService.dto.response.ResponseDTO;
 import com.toyLibrary.toyLibraryService.entity.Product;
+import com.toyLibrary.toyLibraryService.entity.Users;
 import com.toyLibrary.toyLibraryService.repository.ProductRepository;
 import com.toyLibrary.toyLibraryService.services.ProductService;
 import jakarta.transaction.Transactional;
@@ -89,6 +90,10 @@ public class ProductServiceImpl implements ProductService {
             return true;
         }
         return false;
+    }
+
+    public void updateProductBookings(List<Product> products){
+        productRepository.saveAll(products);
     }
 
 }

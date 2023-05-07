@@ -35,4 +35,9 @@ public class UserController {
         return usersService.removeFromCart(userId, productId);
     }
 
+    @GetMapping("/checkout/{userId}")
+    public ResponseDTO<String> checkoutCart(@PathVariable("userId") Integer userId){
+        return usersService.checkoutCart(userId);
+    }
+
 }

@@ -6,9 +6,11 @@ import com.toyLibrary.toyLibraryService.dto.request.RegistrationRequestDTO;
 import com.toyLibrary.toyLibraryService.dto.response.LoginResponseDTO;
 import com.toyLibrary.toyLibraryService.dto.response.ResponseDTO;
 import com.toyLibrary.toyLibraryService.dto.response.UserResponseDTO;
+import com.toyLibrary.toyLibraryService.entity.BookingHistory;
 import com.toyLibrary.toyLibraryService.entity.Product;
 import com.toyLibrary.toyLibraryService.entity.UserType;
 import com.toyLibrary.toyLibraryService.entity.Users;
+import com.toyLibrary.toyLibraryService.repository.BookingHistoryRepository;
 import com.toyLibrary.toyLibraryService.repository.UserTypeRepository;
 import com.toyLibrary.toyLibraryService.repository.UsersRepository;
 import com.toyLibrary.toyLibraryService.services.ProductService;
@@ -18,6 +20,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -34,6 +40,9 @@ public class UsersServiceImpl implements UsersService {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    BookingHistoryRepository bookingHistoryRepository;
 
     public ResponseDTO<LoginResponseDTO> login(LoginRequestDTO req){
         Optional<Users> optionalUser = usersRepository.findByEmail(req.getEmail());
@@ -106,9 +115,9 @@ public class UsersServiceImpl implements UsersService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product is already booked by someone! Cannot add to cart!");
         }
         Optional<Users> optionalUser = usersRepository.findById(userId);
-        // First check if user exists with given email
+        // First check if user exists with given ID
         if(optionalUser.isEmpty()){
-            // User does not exist with given email
+            // User does not exist with given ID
             System.out.println("User was not found! Returning Error!");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with provided ID");
         }
@@ -126,9 +135,9 @@ public class UsersServiceImpl implements UsersService {
 
     public ResponseDTO<UserResponseDTO> removeFromCart(Integer userId, Integer productId){
         Optional<Users> optionalUser = usersRepository.findById(userId);
-        // First check if user exists with given email
+        // First check if user exists with given ID
         if(optionalUser.isEmpty()){
-            // User does not exist with given email
+            // User does not exist with given ID
             System.out.println("User was not found! Returning Error!");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with provided ID");
         }
@@ -141,5 +150,32 @@ public class UsersServiceImpl implements UsersService {
         user = usersRepository.save(user);
         System.out.println("Product removed from cart successfully!");
         return new ResponseDTO<>(new UserResponseDTO(user), HttpStatus.OK.value(), "Product removed from cart successfully!");
+    }
+
+    public ResponseDTO<String> checkoutCart(Integer userId){
+        Optional<Users> optionalUser = usersRepository.findById(userId);
+        // First check if user exists with given ID
+        if(optionalUser.isEmpty()){
+            // User does not exist with given ID
+            System.out.println("User was not found! Returning Error!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with provided ID");
+        }
+        Users user = optionalUser.get();
+        List<Product> cart = user.getCart();
+        List<BookingHistory> bookingHistoryList = new ArrayList<>();
+        Date bookedUntil = Date.valueOf(LocalDate.now().plusMonths(1));
+        cart.stream().forEach(p -> {
+            p.setBookedBy(user);
+            p.setBookedUntil(bookedUntil);
+            bookingHistoryList.add(new BookingHistory(user, p, Date.valueOf(LocalDate.now()), bookedUntil));
+        });
+        bookingHistoryRepository.saveAll(bookingHistoryList);
+        productService.updateProductBookings(cart);
+
+        // Need to reset cart
+        user.setCart(new ArrayList<>());
+        usersRepository.save(user);
+
+        return new ResponseDTO<>(HttpStatus.OK.value(), "Cart checked out!");
     }
 }
