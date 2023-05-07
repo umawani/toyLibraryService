@@ -13,6 +13,7 @@ import com.toyLibrary.toyLibraryService.entity.Users;
 import com.toyLibrary.toyLibraryService.repository.BookingHistoryRepository;
 import com.toyLibrary.toyLibraryService.repository.UserTypeRepository;
 import com.toyLibrary.toyLibraryService.repository.UsersRepository;
+import com.toyLibrary.toyLibraryService.services.BookingHistoryService;
 import com.toyLibrary.toyLibraryService.services.ProductService;
 import com.toyLibrary.toyLibraryService.services.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class UsersServiceImpl implements UsersService {
     ProductService productService;
 
     @Autowired
-    BookingHistoryRepository bookingHistoryRepository;
+    BookingHistoryService bookingHistoryService;
 
     public ResponseDTO<LoginResponseDTO> login(LoginRequestDTO req){
         Optional<Users> optionalUser = usersRepository.findByEmail(req.getEmail());
@@ -169,7 +170,7 @@ public class UsersServiceImpl implements UsersService {
             p.setBookedUntil(bookedUntil);
             bookingHistoryList.add(new BookingHistory(user, p, Date.valueOf(LocalDate.now()), bookedUntil));
         });
-        bookingHistoryRepository.saveAll(bookingHistoryList);
+        bookingHistoryService.saveBookingHistories(bookingHistoryList);
         productService.updateProductBookings(cart);
 
         // Need to reset cart
