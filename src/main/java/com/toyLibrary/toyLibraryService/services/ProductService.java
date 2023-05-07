@@ -8,4 +8,6 @@ import com.toyLibrary.toyLibraryService.dto.response.ResponseDTO;
 public interface ProductService {
     ResponseDTO<ProductListResponseDTO> getProductList();
     ResponseDTO<ProductResponseDTO> addProduct(ProductRequestDTO req);
+    ResponseDTO<ProductResponseDTO> editProduct(ProductRequestDTO req);
+    ResponseDTO<String> deleteProduct(Integer i);
 }
