@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     UsersService usersService;
+
 
     @PostMapping("/login")
     public ResponseDTO<LoginResponseDTO> login(@RequestBody LoginRequestDTO req){
@@ -29,7 +31,6 @@ public class UserController {
     public ResponseDTO<UserResponseDTO> addToCart(@PathVariable("userId") Integer userId, @PathVariable("productId") Integer productId){
         return usersService.addToCart(userId, productId);
     }
-
     @DeleteMapping("/removeFromCart/{userId}/{productId}")
     ResponseDTO<UserResponseDTO> removeFromCart(@PathVariable("userId") Integer userId, @PathVariable("productId") Integer productId){
         return usersService.removeFromCart(userId, productId);

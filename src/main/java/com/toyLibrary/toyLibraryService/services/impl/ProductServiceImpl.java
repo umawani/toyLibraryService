@@ -11,9 +11,12 @@ import com.toyLibrary.toyLibraryService.services.ProductService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -93,6 +96,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public void updateProductBookings(List<Product> products){
+        productRepository.saveAll(products);
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void returnToLibrary(){
+        // Scheduled task to check if the due date has arrived for a toy. If it has, mark as returned/unbooked
+        List<Product> products = productRepository.findAll();
+        products.stream().forEach(p -> {
+            if(Objects.nonNull(p.getBookedUntil()) && p.getBookedUntil().equals(Date.valueOf(LocalDate.now()))){
+                p.setBookedUntil(null);
+                p.setBookedBy(null);
+            }
+        });
         productRepository.saveAll(products);
     }
 
