@@ -19,6 +19,10 @@ public class Product {
     @Basic
     @Column(name = "booked_until")
     private Date bookedUntil;
+    @Basic
+    @Lob
+    @Column(name = "image")
+    private byte[] image;
 
 
 
@@ -52,5 +56,13 @@ public class Product {
 
     public void setBookedUntil(Date bookedUntil) {
         this.bookedUntil = bookedUntil;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }

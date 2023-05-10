@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
@@ -34,10 +36,17 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseDTO<>(response, HttpStatus.OK.value(), "Fetched Product List Successfully!");
     }
 
-    public ResponseDTO<ProductResponseDTO> addProduct(ProductRequestDTO req){
+    public ResponseDTO<ProductResponseDTO> addProduct(ProductRequestDTO req, MultipartFile file){
         // Currently, only adding products by their names. Later want to add images as well
+        byte[] fileBytes = null;
+        try{
+            fileBytes = file.getBytes();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
         Product p = new Product();
         p.setName(req.getName());
+        p.setImage(fileBytes);
         p = productRepository.save(p);
         ProductResponseDTO responseDTO = new ProductResponseDTO(p);
         return new ResponseDTO<>(responseDTO, HttpStatus.OK.value(), "Product Created Successfully!");
