@@ -12,5 +12,5 @@ public interface UsersService {
     ResponseDTO<String> registerCustomer(RegistrationRequestDTO req);
     ResponseDTO<UserResponseDTO> addToCart(Integer userId, Integer productId);
     ResponseDTO<UserResponseDTO> removeFromCart(Integer userId, Integer productId);
-    ResponseDTO<String> checkoutCart(Integer userId);
+    ResponseDTO<UserResponseDTO> checkoutCart(Integer userId);
 }

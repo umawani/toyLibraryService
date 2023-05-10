@@ -24,10 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -153,7 +150,7 @@ public class UsersServiceImpl implements UsersService {
         return new ResponseDTO<>(new UserResponseDTO(user), HttpStatus.OK.value(), "Product removed from cart successfully!");
     }
 
-    public ResponseDTO<String> checkoutCart(Integer userId){
+    public ResponseDTO<UserResponseDTO> checkoutCart(Integer userId){
         Optional<Users> optionalUser = usersRepository.findById(userId);
         // First check if user exists with given ID
         if(optionalUser.isEmpty()){
@@ -165,11 +162,20 @@ public class UsersServiceImpl implements UsersService {
         List<Product> cart = user.getCart();
         List<BookingHistory> bookingHistoryList = new ArrayList<>();
         Date bookedUntil = Date.valueOf(LocalDate.now().plusMonths(1));
-        cart.stream().forEach(p -> {
+        String alreadyBooked = "";
+        for(Product p : cart){
+            if(Objects.nonNull(p.getBookedUntil())){
+                alreadyBooked += p.getName() + "\n";
+                continue;
+            }
             p.setBookedBy(user);
             p.setBookedUntil(bookedUntil);
             bookingHistoryList.add(new BookingHistory(user, p, Date.valueOf(LocalDate.now()), bookedUntil));
-        });
+        }
+        if(!alreadyBooked.equals("")){
+            String finalString = "These items are already booked, please try again later: \n" + alreadyBooked;
+            return new ResponseDTO<>(HttpStatus.CONFLICT.value(), finalString);
+        }
         bookingHistoryService.saveBookingHistories(bookingHistoryList);
         productService.updateProductBookings(cart);
 
@@ -177,6 +183,6 @@ public class UsersServiceImpl implements UsersService {
         user.setCart(new ArrayList<>());
         usersRepository.save(user);
 
-        return new ResponseDTO<>(HttpStatus.OK.value(), "Cart checked out!");
+        return new ResponseDTO<>(new UserResponseDTO(user), HttpStatus.OK.value(), "Cart checked out!");
     }
 }

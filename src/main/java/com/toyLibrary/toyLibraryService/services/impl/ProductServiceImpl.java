@@ -37,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public ResponseDTO<ProductResponseDTO> addProduct(ProductRequestDTO req, MultipartFile file){
-        // Currently, only adding products by their names. Later want to add images as well
+        // Add product by image and name
         byte[] fileBytes = null;
         try{
             fileBytes = file.getBytes();
@@ -52,7 +52,8 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseDTO<>(responseDTO, HttpStatus.OK.value(), "Product Created Successfully!");
     }
 
-    public ResponseDTO<ProductResponseDTO> editProduct(ProductRequestDTO req){
+    public ResponseDTO<ProductResponseDTO> editProduct(ProductRequestDTO req, MultipartFile file){
+        // Edit product's name and image
         Optional<Product> optionalProduct = productRepository.findById(req.getId());
         if(optionalProduct.isEmpty()){
             // Product does not exist! Returning Error!
@@ -61,6 +62,13 @@ public class ProductServiceImpl implements ProductService {
         }
         // Found product with provided ID
         Product p = optionalProduct.get();
+        byte[] fileBytes = null;
+        try{
+            fileBytes = file.getBytes();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        p.setImage(fileBytes);
         p.setName(req.getName());
         p = productRepository.save(p);
 

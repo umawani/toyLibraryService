@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/checkout/{userId}")
-    public ResponseDTO<String> checkoutCart(@PathVariable("userId") Integer userId){
+    public ResponseDTO<UserResponseDTO> checkoutCart(@PathVariable("userId") Integer userId){
         return usersService.checkoutCart(userId);
     }
 
