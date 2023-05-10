@@ -51,14 +51,14 @@ public class UsersServiceImpl implements UsersService {
         if(optionalUser.isEmpty()){
             // User does not exist with given email
             System.out.println("User was not found! Returning Error!");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect Email/Password Combination");
+            return new ResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Incorrect Email/Password Combination");
         }
         // User does exist with given email, now check if the password inputted is correct
         Users user = optionalUser.get();
         if(!user.getPassword().equals(req.getPassword())){
             // Inputted password is incorrect!
             System.out.println("Incorrect password inputted! Returning Error!");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect Email/Password Combination");
+            return new ResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Incorrect Email/Password Combination");
         }
         // All checks passed! User exists so now need to return a token
         System.out.println("Details provided verified! Logging in...");
@@ -71,7 +71,7 @@ public class UsersServiceImpl implements UsersService {
         if(optionalUser.isPresent()){
             // User already exists!
             System.out.println("User already exists with provided email!");
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists!");
+            return new ResponseDTO<>(HttpStatus.CONFLICT.value(), "User already exists!");
         }
         Users newUser = new Users();
 
@@ -113,14 +113,14 @@ public class UsersServiceImpl implements UsersService {
         if(productService.checkIfProductIsAlreadyBooked(productId)){
             // Product is already booked, return error
             System.out.println("Product is already booked! Cannot add to cart!");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product is already booked by someone! Cannot add to cart!");
+            return new ResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Product is already booked by someone! Cannot add to cart!");
         }
         Optional<Users> optionalUser = usersRepository.findById(userId);
         // First check if user exists with given ID
         if(optionalUser.isEmpty()){
             // User does not exist with given ID
             System.out.println("User was not found! Returning Error!");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with provided ID");
+            return new ResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "User not found with provided ID");
         }
         Users user = optionalUser.get();
         List<Product> currentCart = user.getCart();
@@ -140,7 +140,7 @@ public class UsersServiceImpl implements UsersService {
         if(optionalUser.isEmpty()){
             // User does not exist with given ID
             System.out.println("User was not found! Returning Error!");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with provided ID");
+            return new ResponseDTO(HttpStatus.BAD_REQUEST.value(), "User not found with provided ID");
         }
         Users user = optionalUser.get();
         List<Product> currentCart = user.getCart();
@@ -159,7 +159,7 @@ public class UsersServiceImpl implements UsersService {
         if(optionalUser.isEmpty()){
             // User does not exist with given ID
             System.out.println("User was not found! Returning Error!");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found with provided ID");
+            return new ResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "User not found with provided ID");
         }
         Users user = optionalUser.get();
         List<Product> cart = user.getCart();

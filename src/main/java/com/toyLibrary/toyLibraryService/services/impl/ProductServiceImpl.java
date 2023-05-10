@@ -57,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
         if(optionalProduct.isEmpty()){
             // Product does not exist! Returning Error!
             System.out.println("Product does not exist with given ID!");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found with provided ID!");
+            return new ResponseDTO<>(HttpStatus.NOT_FOUND.value(), "Product not found with provided ID!");
         }
         // Found product with provided ID
         Product p = optionalProduct.get();
@@ -74,14 +74,14 @@ public class ProductServiceImpl implements ProductService {
         if(optionalProduct.isEmpty()){
             // Product does not exist! Returning Error!
             System.out.println("Product does not exist with given ID!");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found with provided ID!");
+            return new ResponseDTO<>(HttpStatus.NOT_FOUND.value(), "Product not found with provided ID!");
         }
         // If product exists, check if it is not currently booked by someone
         Product p = optionalProduct.get();
         if(checkIfProductIsAlreadyBooked(id)){
             // Currently, booked by someone! Cannot delete!
             System.out.println("Product currently booked by a customer!");
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Product is currently booked by a customer! Cannot delete!");
+            return new ResponseDTO<>(HttpStatus.CONFLICT.value(), "Product is currently booked by a customer! Cannot delete!");
         }
         // Product is free to delete!
         productRepository.delete(p);
